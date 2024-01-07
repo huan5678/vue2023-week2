@@ -37,6 +37,11 @@ jobs:
           node-version: '14'
           cache: 'pnpm'
       - run: pnpm install
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: production-files
+          path: ./dist
       - name: Build
         env:
           VITE_BASENAME: ${{ secrets.VITE_BASENAME}}
@@ -49,5 +54,7 @@ jobs:
           # Upload dist repository
           path: './dist'
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
