@@ -28,15 +28,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
-          version: 6.32.9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '14'
-          cache: 'pnpm'
-      - run: pnpm install
+          node-version: 18
+      - name: Install PNPM
+        run: npm i -g pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm build
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
@@ -51,10 +54,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          # Upload dist repository
+          # Upload entire repository
           path: './dist'
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+        id: deployment
+        uses: actions/deploy-pages@v2
